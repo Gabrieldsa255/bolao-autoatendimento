@@ -33,10 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Aplicação JavaFX do Sistema Bolão Santa Teresa.
- * Integra TOTEM, Garçom/Gerente e Cozinha usando os DAOs.
- */
+
 public class BolaoApp extends Application {
 
     // Cores
@@ -52,7 +49,6 @@ public class BolaoApp extends Application {
     private static final String COR_CARD_LIVRE = "#3B8E3C";       // verde
     private static final String COR_CARD_OCUPADA = "#D84343";     // vermelho
     private static final String COR_CARD_COM_PEDIDO = "#FFC928";  // amarelo
-
 
     private static final String LOGO_RESOURCE = "/bolao-simbolo.png";
 
@@ -702,7 +698,7 @@ public class BolaoApp extends Application {
     }
 
 
-    // PAGAMENTO E NOTA"
+    // PAGAMENTO E NOTA
 
     private String abrirDialogoPagamento(double total, Map<Produto, IntegerProperty> mapaQuantidades) {
         Stage dialog = new Stage();
@@ -967,7 +963,6 @@ public class BolaoApp extends Application {
         dialog.initModality(Modality.WINDOW_MODAL);
         dialog.setTitle("Gerenciar mesa");
 
-
         Pedido pedidoAtual = pedidoDAO.buscarPedidoAbertoPorMesa(mesa.getNumero());
 
         Label lblTitulo = new Label("Mesa " + mesa.getNumero());
@@ -1068,7 +1063,6 @@ public class BolaoApp extends Application {
         // Pedidos para a cozinha
         List<Pedido> pedidos = pedidoDAO.listarPedidosCozinha();
 
-
         for (Pedido pedido : pedidos) {
             String status = pedido.getStatus();
             if (status != null && status.equalsIgnoreCase("PRONTO")) {
@@ -1113,6 +1107,7 @@ public class BolaoApp extends Application {
         primaryStage.setScene(scene);
     }
 
+    // >>> MÉTODO AJUSTADO AQUI <<<
     private HBox criarCardPedidoCozinha(Pedido pedido) {
         String tipo = pedido.getTipoAtendimento() == null ? "" : pedido.getTipoAtendimento();
         String titulo;
@@ -1141,6 +1136,7 @@ public class BolaoApp extends Application {
         VBox esquerda = new VBox(5, lblMesa, lblInfo);
         esquerda.setAlignment(Pos.CENTER_LEFT);
 
+        // Botão DETALHES
         Button btnDetalhes = new Button("Detalhes");
         estilizarBotaoConfirmar(btnDetalhes);
         btnDetalhes.setOnAction(e -> {
@@ -1148,28 +1144,24 @@ public class BolaoApp extends Application {
             mostrarItensPedidoDetalhado(cabecalho, pedido.getIdPedido());
         });
 
-        // Botão
-        Button btnEmPreparo = new Button("Em preparação");
-        estilizarBotaoConfirmar(btnEmPreparo);
-        String statusUpper = status.toUpperCase();
-        btnEmPreparo.setDisable(statusUpper.equals("EM PREPARAÇÃO") || statusUpper.equals("PRONTO"));
-        btnEmPreparo.setOnAction(e -> {
-            pedidoDAO.atualizarStatusPedido(pedido.getIdPedido(), "EM PREPARAÇÃO");
-            mostrarMensagemTema("Status atualizado",
-                    "O pedido #" + pedido.getIdPedido() + " foi marcado como EM PREPARAÇÃO.");
-            abrirModuloCozinha();
-        });
-
+        // Botão único para o cozinheiro: PEDIDO PRONTO
         Button btnPronto = new Button("Pedido pronto");
         estilizarBotaoConfirmar(btnPronto);
+
+        String statusUpper = status.toUpperCase();
+        // se já estiver PRONTO, não permite clicar de novo
+        btnPronto.setDisable(statusUpper.equals("PRONTO"));
+
         btnPronto.setOnAction(e -> {
             pedidoDAO.atualizarStatusPedido(pedido.getIdPedido(), "PRONTO");
-            mostrarMensagemTema("Pedido pronto",
-                    "O pedido #" + pedido.getIdPedido() + " foi marcado como PRONTO.");
+            mostrarMensagemTema(
+                    "Pedido pronto",
+                    "O pedido #" + pedido.getIdPedido() + " foi marcado como PRONTO."
+            );
             abrirModuloCozinha();
         });
 
-        HBox linhaBotoes = new HBox(10, btnDetalhes, btnEmPreparo, btnPronto);
+        HBox linhaBotoes = new HBox(10, btnDetalhes, btnPronto);
         linhaBotoes.setAlignment(Pos.CENTER_RIGHT);
 
         VBox box = new VBox(10, esquerda, linhaBotoes);

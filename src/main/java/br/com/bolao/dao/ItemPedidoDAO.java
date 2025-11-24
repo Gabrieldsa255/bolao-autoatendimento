@@ -2,13 +2,9 @@ package br.com.bolao.dao;
 
 import br.com.bolao.entity.ItemPedido;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ItemPedidoDAO {
 
@@ -37,15 +33,27 @@ public class ItemPedidoDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            System.out.printf(
+                    "[ItemPedidoDAO] Inserindo item -> pedido=%d, produto=%d, qtd=%d, unit=%.2f, total=%.2f%n",
+                    idPedido, idProduto, quantidade, valorUnitario, valorTotal
+            );
+
             ps.setInt(1, idPedido);
             ps.setInt(2, idProduto);
             ps.setInt(3, quantidade);
             ps.setDouble(4, valorUnitario);
             ps.setDouble(5, valorTotal);
-            ps.setString(6, observacao);
+
+            if (observacao == null || observacao.isBlank()) {
+                ps.setNull(6, Types.VARCHAR);
+            } else {
+                ps.setString(6, observacao);
+            }
+
             ps.executeUpdate();
 
         } catch (SQLException e) {
+            System.out.println("❌ Erro ao inserir item_pedido:");
             e.printStackTrace();
         }
     }
@@ -57,7 +65,7 @@ public class ItemPedidoDAO {
         List<ItemPedido> itens = new ArrayList<>();
 
         String sql =
-                "SELECT ip.id_produto, ip.quantidade, ip.valor_total, " +
+                "SELECT ip.id_produto, ip.quantidade, ip.valor_unitario, ip.valor_total, " +
                         "       p.nome AS nome_produto " +
                         "FROM item_pedido ip " +
                         "JOIN produto p ON p.id_produto = ip.id_produto " +
@@ -72,27 +80,18 @@ public class ItemPedidoDAO {
                 while (rs.next()) {
                     ItemPedido item = new ItemPedido();
 
-                    try {
-                        item.setIdProduto(rs.getInt("id_produto"));
-                    } catch (SQLException ignored) {}
-
-                    try {
-                        item.setQuantidade(rs.getInt("quantidade"));
-                    } catch (SQLException ignored) {}
-
-                    try {
-                        item.setValorTotal(rs.getDouble("valor_total"));
-                    } catch (SQLException ignored) {}
-
-                    try {
-                        item.setNomeProduto(rs.getString("nome_produto"));
-                    } catch (SQLException ignored) {}
+                    item.setIdProduto(rs.getInt("id_produto"));
+                    item.setQuantidade(rs.getInt("quantidade"));
+                    item.setValorUnitario(rs.getDouble("valor_unitario"));
+                    item.setValorTotal(rs.getDouble("valor_total"));
+                    item.setNomeProduto(rs.getString("nome_produto"));
 
                     itens.add(item);
                 }
             }
 
         } catch (SQLException e) {
+            System.out.println("Erro ao listar itens do pedido:");
             e.printStackTrace();
         }
 
