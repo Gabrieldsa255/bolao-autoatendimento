@@ -30,37 +30,27 @@ public class MesaDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("❌ Erro ao listar mesas:");
+            System.out.println("Erro ao listar mesas:");
             e.printStackTrace();
         }
 
         return mesas;
     }
 
-    public Mesa buscarPorNumero(int numero) {
-        String sql = "SELECT id_mesa, numero, status, observacao FROM mesa WHERE numero = ?";
+
+    public void atualizarStatusMesa(int idMesa, String novoStatus) {
+        String sql = "UPDATE mesa SET status = ? WHERE id_mesa = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, numero);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Mesa mesa = new Mesa();
-                    mesa.setIdMesa(rs.getInt("id_mesa"));
-                    mesa.setNumero(rs.getInt("numero"));
-                    mesa.setStatus(rs.getString("status"));
-                    mesa.setObservacao(rs.getString("observacao"));
-                    return mesa;
-                }
-            }
+            stmt.setString(1, novoStatus);
+            stmt.setInt(2, idMesa);
+            stmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("❌ Erro ao buscar mesa por número:");
+            System.out.println("Erro ao atualizar status da mesa:");
             e.printStackTrace();
         }
-
-        return null;
     }
 }

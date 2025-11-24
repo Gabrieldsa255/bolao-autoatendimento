@@ -99,9 +99,7 @@ public class ProdutoDAO {
         return produtos;
     }
 
-    // =========================================================
-    // Método auxiliar para montar objeto Produto
-    // =========================================================
+
     private Produto mapearProduto(ResultSet rs) throws SQLException {
         Produto p = new Produto();
         p.setIdProduto(rs.getInt("id_produto"));

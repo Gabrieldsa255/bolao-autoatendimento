@@ -10,7 +10,7 @@ public class ItemPedido {
     private Double valorTotal;
     private String observacao;
 
-    // Campo extra para facilitar exibição na cozinha/caixa
+    // Exibição na cozinha/caixa
     private String nomeProduto;
 
     public Integer getIdItem() {

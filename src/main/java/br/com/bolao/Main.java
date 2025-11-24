@@ -1,4 +1,3 @@
-// src/main/java/br/com/bolao/Main.java
 package br.com.bolao;
 
 import br.com.bolao.dao.*;
@@ -54,9 +53,9 @@ public class Main {
         scanner.close();
     }
 
-    // =========================================================
+
     // MÓDULO TOTEM (cliente)
-    // =========================================================
+
     private static void executarTotem(Scanner scanner,
                                       MesaDAO mesaDAO,
                                       ProdutoDAO produtoDAO,
@@ -117,7 +116,7 @@ public class Main {
         }
     }
 
-    // fluxo pedido MESA (TOTEM) + pagamento fictício no totem
+    // pedido
     private static void fluxoPedidoMesaTotem(Scanner scanner,
                                              MesaDAO mesaDAO,
                                              ProdutoDAO produtoDAO,
@@ -131,28 +130,28 @@ public class Main {
         System.out.print("\nDigite o número da mesa: ");
         int numeroMesa = lerInteiro(scanner);
 
-        // 1) tenta achar um pedido ativo para essa mesa (sessão de uso)
+
         Pedido pedido = pedidoDAO.buscarPedidoAbertoPorMesa(numeroMesa);
 
         if (pedido == null) {
             // não existe sessão -> cria uma nova
             pedido = pedidoDAO.criarPedidoMesa(numeroMesa, null);
             if (pedido == null) {
-                // DAO já exibiu mensagem de erro (mesa inexistente ou não LIVRE)
+
                 return;
             }
             System.out.println("✅ Pedido aberto para a mesa " + numeroMesa +
                     ". Código do pedido: " + pedido.getIdPedido());
         } else {
-            // já existe pedido ativo -> apenas adicionar itens nele
-            System.out.println("➕ Adicionando itens ao pedido existente "
+
+            System.out.println("+ Adicionando itens ao pedido existente "
                     + pedido.getIdPedido() + " da mesa " + numeroMesa);
         }
 
-        // 2) fluxo de itens (COMIDA / BEBIDA)
+        // fluxo de itens (COMIDA / BEBIDA)
         adicionarItensPorCategoria(scanner, produtoDAO, itemPedidoDAO, pedido);
 
-        // 3) valida e fecha fluxo do totem
+        //  valida e fecha fluxo do totem
         List<ItemPedido> itens = itemPedidoDAO.listarPorPedido(pedido.getIdPedido());
         if (itens.isEmpty()) {
             System.out.println("⚠ Nenhum item adicionado. Pedido não será enviado para a cozinha.");
@@ -188,7 +187,7 @@ public class Main {
 
         System.out.println("✅ Pedido de retirada criado. Código: " + pedido.getIdPedido());
 
-        // fluxo de itens (COMIDA / BEBIDA)
+        // fluxo de itens
         adicionarItensPorCategoria(scanner, produtoDAO, itemPedidoDAO, pedido);
 
         List<ItemPedido> itens = itemPedidoDAO.listarPorPedido(pedido.getIdPedido());
@@ -201,13 +200,13 @@ public class Main {
         imprimirNotaFinal(pedido, itens, total);
         registrarPagamentoTotem(scanner, pedido, total, pagamentoDAO);
 
-        System.out.println("🍳 Pedido de retirada enviado para a cozinha!");
+        System.out.println(" Pedido de retirada enviado para a cozinha!");
 
     }
 
-    // =========================================================
-    // Adiciona itens ao pedido separando COMIDA e BEBIDA
-    // =========================================================
+
+    // Adiciona itens ao pedido separando comida e bebida
+
     private static void adicionarItensPorCategoria(Scanner scanner,
                                                    ProdutoDAO produtoDAO,
                                                    ItemPedidoDAO itemPedidoDAO,
@@ -224,7 +223,7 @@ public class Main {
             int opc = lerInteiro(scanner);
 
             if (opc == 0) {
-                // Sai do loop → volta para o fluxo principal (nota/pagamento)
+
                 adicionando = false;
                 break;
             }
@@ -247,14 +246,14 @@ public class Main {
                 continue;
             }
 
-            // Mostra cardápio filtrado
+
             mostrarCardapio(produtosCategoria);
 
             System.out.print("\nDigite o ID do produto (0 para voltar ao menu de COMIDA/BEBIDA): ");
             int idProdutoEscolhido = lerInteiro(scanner);
 
             if (idProdutoEscolhido == 0) {
-                // volta a escolher COMIDA ou BEBIDA
+
                 continue;
             }
 
@@ -279,9 +278,8 @@ public class Main {
         }
     }
 
-    // =========================================================
     // Funções de apoio (mesas, cardápio, impressão, pagamento)
-    // =========================================================
+
     private static void listarMesas(MesaDAO mesaDAO) {
         List<Mesa> mesas = mesaDAO.listarTodas();
         System.out.println("\n🪑 Mesas cadastradas no sistema:");
@@ -290,13 +288,13 @@ public class Main {
         }
     }
 
-    // Cardápio buscando direto do banco
+    // Cardápio do banco de dados
     private static void mostrarCardapio(ProdutoDAO produtoDAO) {
         List<Produto> produtos = produtoDAO.listarAtivos();
         mostrarCardapio(produtos);
     }
 
-    // Cardápio reaproveitando lista já carregada
+
     private static void mostrarCardapio(List<Produto> produtos) {
         System.out.println("\n🍽️ Cardápio:");
         for (Produto p : produtos) {
@@ -305,7 +303,7 @@ public class Main {
         }
     }
 
-    // CORREÇÃO: getIdProduto provavelmente é int, então usamos ==
+
     private static Produto buscarProdutoPorId(List<Produto> produtos, int idProduto) {
         for (Produto p : produtos) {
             if (p.getIdProduto() == idProduto) {
@@ -339,7 +337,7 @@ public class Main {
         System.out.printf("TOTAL: R$ %.2f%n", total);
     }
 
-    // PAGAMENTO FICTÍCIO: apenas registra e mostra mensagem
+    // PAGAMENTO FICTÍCIO
     private static void registrarPagamentoTotem(Scanner scanner,
                                                 Pedido pedido,
                                                 double total,
@@ -378,9 +376,9 @@ public class Main {
         System.out.println("✅ Pagamento confirmado no totem.");
     }
 
-    // =========================================================
+
     // MÓDULO COZINHA
-    // =========================================================
+
     private static void executarModuloCozinha(Scanner scanner,
                                               PedidoDAO pedidoDAO,
                                               ItemPedidoDAO itemPedidoDAO) {
@@ -486,14 +484,14 @@ public class Main {
             return;
         }
 
-        // CORREÇÃO: usa o método atual do DAO
+
         pedidoDAO.atualizarStatusPedido(idEscolhido, novoStatus);
         System.out.println("✅ Pedido " + idEscolhido + " atualizado para " + novoStatus + ".");
     }
 
-    // =========================================================
+
     // MÓDULO GARÇOM / GERENTE
-    // =========================================================
+
     private static void executarModuloGarcom(Scanner scanner,
                                              MesaDAO mesaDAO,
                                              ProdutoDAO produtoDAO,
@@ -527,7 +525,7 @@ public class Main {
         } while (opcao != 0);
     }
 
-    // Garçom escolhe uma mesa e entra em um loop de atendimento só dela
+    // Garçom escolhe uma mesa e entra em um atendimento só dela
     private static void fluxoGarcomTrabalharMesa(Scanner scanner,
                                                  MesaDAO mesaDAO,
                                                  ProdutoDAO produtoDAO,
@@ -577,7 +575,7 @@ public class Main {
         }
     }
 
-    // Ver resumo da mesa (itens + total)
+    // Ver resumo da mesa
     private static void verResumoMesaNumero(int numeroMesa,
                                             PedidoDAO pedidoDAO,
                                             ItemPedidoDAO itemPedidoDAO) {
@@ -598,18 +596,18 @@ public class Main {
         imprimirNotaFinal(pedido, itens, total);
     }
 
-    // Adicionar itens à mesa (garçom)
+
     private static void adicionarItensMesaGarcom(Scanner scanner,
                                                  int numeroMesa,
                                                  ProdutoDAO produtoDAO,
                                                  PedidoDAO pedidoDAO,
                                                  ItemPedidoDAO itemPedidoDAO) {
 
-        // Busca pedido ativo (sessão)
+        // Busca pedido ativo
         Pedido pedido = pedidoDAO.buscarPedidoAbertoPorMesa(numeroMesa);
 
         if (pedido == null) {
-            // Não existe sessão -> abre uma nova com observação
+
             pedido = pedidoDAO.criarPedidoMesa(numeroMesa, "Comanda aberta pelo garçom");
             if (pedido == null) {
                 return;
@@ -621,7 +619,7 @@ public class Main {
                     + pedido.getIdPedido() + " da mesa " + numeroMesa);
         }
 
-        // Usa o mesmo fluxo COMIDA / BEBIDA do totem
+
         adicionarItensPorCategoria(scanner, produtoDAO, itemPedidoDAO, pedido);
 
         double total = pedidoDAO.calcularTotalPedido(pedido.getIdPedido());
@@ -632,7 +630,7 @@ public class Main {
         }
     }
 
-    // Ver conta parcial (só total)
+
     private static void verContaParcialMesa(int numeroMesa,
                                             PedidoDAO pedidoDAO) {
 
@@ -652,7 +650,7 @@ public class Main {
                                              PedidoDAO pedidoDAO,
                                              ItemPedidoDAO itemPedidoDAO) {
 
-        // Busca o pedido "ativo" (sessão aberta) dessa mesa
+        // Busca o pedido
         Pedido pedido = pedidoDAO.buscarPedidoAbertoPorMesa(numeroMesa);
         if (pedido == null) {
             System.out.println("Nenhum pedido ativo encontrado para a mesa " + numeroMesa + ".");
@@ -679,16 +677,14 @@ public class Main {
             return false;
         }
 
-        // CORREÇÃO: usa o método atual do DAO
+
         pedidoDAO.atualizarStatusPedido(pedido.getIdPedido(), "ENTREGUE");
 
         System.out.println("✅ Mesa " + numeroMesa + " liberada para um novo cliente.");
         return true;
     }
 
-    // =========================================================
-    // Utilitário para ler inteiros sem quebrar o scanner
-    // =========================================================
+
     private static int lerInteiro(Scanner scanner) {
         while (!scanner.hasNextInt()) {
             System.out.print("Digite um número válido: ");

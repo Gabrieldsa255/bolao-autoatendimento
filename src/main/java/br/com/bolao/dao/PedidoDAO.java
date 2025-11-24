@@ -184,7 +184,7 @@ public class PedidoDAO {
      * Usado em liberarMesaGarcom no Main.
      */
     public void fecharPedido(int idPedido) {
-        // 1) Marca pedido como ENTREGUE (e data_hora_fechamento = NOW)
+        // 1) Marca pedido como ENTREGUE )
         atualizarStatusPedido(idPedido, "ENTREGUE");
 
         // 2) Libera a mesa ligada a esse pedido
@@ -204,11 +204,9 @@ public class PedidoDAO {
         }
     }
 
-    // =========================================================
-    // LISTAGENS PARA COZINHA
-    // =========================================================
 
-    // Implementação base usada pelos dois nomes de método
+    // LISTAGENS PARA COZINHA
+
     private List<Pedido> listarPedidosCozinhaBase() {
         List<Pedido> lista = new ArrayList<>();
 
@@ -270,9 +268,7 @@ public class PedidoDAO {
         return 0.0;
     }
 
-    // =========================================================
-    // MAPEAMENTO ResultSet -> Pedido
-    // =========================================================
+    // Pedido
 
     private Pedido mapearPedido(ResultSet rs) throws SQLException {
         Pedido p = new Pedido();
